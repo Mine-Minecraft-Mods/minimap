@@ -1,0 +1,93 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	maven {
+		name = 'Terraformers'
+		url = 'https://maven.terraformersmc.com/releases/'
+	}
+	mavenCentral()
+}
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"minimap" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+}
+
+// Fabric API modules bundled inside the mod jar (jar-in-jar), so players do not need to
+// install Fabric API. With the full Fabric API installed, the Loader picks the newest copy.
+def bundledFabricModules = [
+	"fabric-api-base",
+	"fabric-lifecycle-events-v1",
+	"fabric-networking-api-v1",
+	"fabric-key-mapping-api-v1",
+	"fabric-rendering-v1",
+	"fabric-resource-loader-v1",
+]
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	bundledFabricModules.each {
+		include(implementation(fabricApi.module(it, project.fabric_api_version)))
+	}
+
+	// Optional: opens the config screen from the mod list.
+	clientCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") {
+		transitive = false
+	}
+
+	testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+// The pure classes under test (coordinate math, colour shading) live in the client source set.
+sourceSets {
+	test {
+		compileClasspath += sourceSets.client.output + sourceSets.client.compileClasspath
+		runtimeClasspath += sourceSets.client.output + sourceSets.client.runtimeClasspath
+	}
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// Runs the built jar in a production-like client (no dev classpath), catching
+// missing runtime dependencies that runClient hides.
+tasks.register("runProductionClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+	mods.from(tasks.jar)
+}

@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "dev.luisf.minimap.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BlockChangeMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

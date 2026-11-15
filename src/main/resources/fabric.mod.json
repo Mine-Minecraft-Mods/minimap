@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "minimap",
+	"version": "${version}",
+	"name": "Minimap",
+	"description": "Top-down minimap in the bottom-right corner and a full-screen map opened with M.",
+	"authors": ["luisf"],
+	"license": "MIT",
+	"icon": "assets/minimap/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["dev.luisf.minimap.MinimapClient"],
+		"modmenu": ["dev.luisf.minimap.config.ModMenuIntegration"]
+	},
+	"mixins": [
+		{
+			"config": "minimap.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api-base": "*",
+		"fabric-lifecycle-events-v1": "*",
+		"fabric-networking-api-v1": "*",
+		"fabric-key-mapping-api-v1": "*",
+		"fabric-rendering-v1": "*",
+		"fabric-resource-loader-v1": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

@@ -41,4 +41,4 @@ replay_*.log
 
 # game logs written by tests
 logs/
-run_production.log
+run_production*.log

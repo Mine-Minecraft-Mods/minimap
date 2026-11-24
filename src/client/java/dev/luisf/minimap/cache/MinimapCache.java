@@ -121,6 +121,11 @@ public final class MinimapCache {
 		return indexing;
 	}
 
+	/** Number of loaded chunks tracked by the cache (for debug logging). */
+	public int loadedChunksCount() {
+		return loadedChunks.size();
+	}
+
 	public void setIndexing(boolean indexing) {
 		this.indexing = indexing;
 		if (!indexing) {

@@ -67,15 +67,13 @@ public final class MinimapTexture {
 
 		for (int x = 0; x < size; x++) {
 			double screenX = (x + 0.5) / size * 2.0 - 1.0;
-			int color = 0;
+			int color = MinimapMap.UNLOADED_COLOR;
 			if (!circle || screenX * screenX + screenY * screenY <= 1.0) {
 				double[] offset = MinimapMath.worldOffset(screenX * radius, screenY * radius, yaw, rotate);
 				int blockX = (int) Math.floor(centerX + offset[0]);
 				int blockZ = (int) Math.floor(centerZ + offset[1]);
 				int sampled = map.colorAt(level, blockX, blockZ);
-				if (sampled != -1) {
-					color = sampled;
-				}
+				color = sampled;
 			}
 			pixels.setPixel(x, row, color);
 		}

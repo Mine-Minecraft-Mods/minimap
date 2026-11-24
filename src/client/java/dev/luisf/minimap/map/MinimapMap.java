@@ -17,18 +17,20 @@ public final class MinimapMap {
 	}
 
 	/**
-	 * Colour of the column at {@code (x, z)} as ARGB, shaded by height, or {@code -1} when the
-	 * chunk is not loaded or not scanned yet.
+	 * Colour of the column at {@code (x, z)} as ARGB, shaded by height. Returns
+	 * {@link #UNLOADED_COLOR} when the chunk is not loaded or not scanned yet.
 	 */
+	public static final int UNLOADED_COLOR = 0xFF333333;
+
 	public int colorAt(ClientLevel level, int x, int z) {
 		ChunkData data = cache.data(ChunkPos.pack(x >> 4, z >> 4));
 		if (data == null || !data.scanned) {
-			return -1;
+			return UNLOADED_COLOR;
 		}
 		int index = (z & 15) * 16 + (x & 15);
 		int argb = data.colors[index];
 		if (argb == 0) {
-			return -1;
+			return UNLOADED_COLOR;
 		}
 		float shade = MinimapMath.heightShade(data.heights[index], level.getSeaLevel());
 		return MinimapMath.scaleRgb(argb, shade);

@@ -3,6 +3,7 @@ package dev.luisf.minimap.hud;
 import dev.luisf.minimap.MinimapClient;
 import dev.luisf.minimap.MinimapClient.Marker;
 import dev.luisf.minimap.config.MinimapConfig;
+import dev.luisf.minimap.map.MinimapTexture;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -61,8 +62,8 @@ public final class MinimapHud {
 			Vec3 center = camera != null ? camera.getPosition(partialTick) : client.player.position();
 
 			graphics.fill(x, y, right, bottom, BACKGROUND);
-			Identifier texture = MinimapClient.miniTexture().id();
-			graphics.blit(texture, x, y, size, size, 0.0F, 0.0F, 1.0F, 1.0F);
+			MinimapTexture miniTexture = MinimapClient.miniTexture();
+			graphics.blit(miniTexture.view(), miniTexture.sampler(), x, y, size, size, 0.0F, 0.0F, 1.0F, 1.0F);
 			drawBorder(graphics, x, y, size);
 
 			if (config.showCompass) {

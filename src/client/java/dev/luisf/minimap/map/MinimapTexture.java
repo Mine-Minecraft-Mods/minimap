@@ -1,12 +1,18 @@
 package dev.luisf.minimap.map;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.renderpearl.api.textures.AddressMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.renderpearl.backend.opengl.GlSampler;
 import dev.luisf.minimap.MinimapClient;
 import dev.luisf.minimap.config.MinimapConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
+import java.util.OptionalDouble;
 
 /**
  * A square texture holding the top-down map. The texture is centred on a world position and
@@ -15,8 +21,18 @@ import net.minecraft.resources.Identifier;
  * <p>The corner minimap uses a small texture (256 px) rebuilt a few times per second. The
  * expanded map uses a large one (512 px) rebuilt in slices, so it fills in gradually instead
  * of freezing the client.
+ *
+ * <p>In Minecraft 26.x the {@code blit(Identifier, ...)} path looks up textures through the
+ * resource manager and never finds textures registered manually in {@code TextureManager},
+ * so we expose the {@link GpuTextureView} and a {@link GpuSampler} and let callers use the
+ * {@code blit(GpuTextureView, GpuSampler, ...)} path instead.
  */
 public final class MinimapTexture {
+	private static final GpuSampler SAMPLER = new GlSampler(
+			AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE,
+			FilterMode.NEAREST, FilterMode.NEAREST,
+			1, OptionalDouble.empty());
+
 	private final int size;
 	private final boolean rotate;
 	private final Identifier id;
@@ -37,6 +53,16 @@ public final class MinimapTexture {
 
 	public int size() {
 		return size;
+	}
+
+	/** The GPU texture view, for rendering with {@code blit(GpuTextureView, GpuSampler, ...)}. */
+	public GpuTextureView view() {
+		return texture.getTextureView();
+	}
+
+	/** Nearest-neighbor sampler that clamps to the edge. */
+	public GpuSampler sampler() {
+		return SAMPLER;
 	}
 
 	/** Rebuilds every pixel around {@code (centerX, centerZ)}. */
@@ -79,7 +105,7 @@ public final class MinimapTexture {
 		}
 	}
 
-	/** Closes the GPU texture (world change). */
+	/** Closes the GPU texture and sampler (world change). */
 	public void close() {
 		texture.close();
 	}

@@ -5,6 +5,7 @@ import dev.luisf.minimap.MinimapClient;
 import dev.luisf.minimap.MinimapClient.Marker;
 import dev.luisf.minimap.config.MinimapConfig;
 import dev.luisf.minimap.map.MinimapMath;
+import dev.luisf.minimap.map.MinimapTexture;
 import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -76,7 +77,8 @@ public final class MinimapScreen extends Screen {
 		double drawX = width / 2.0 + offsetX - drawSize / 2.0;
 		double drawY = height / 2.0 + offsetY - drawSize / 2.0;
 
-		graphics.blit(MinimapClient.mapTexture().id(), (int) Math.round(drawX), (int) Math.round(drawY),
+		MinimapTexture mapTexture = MinimapClient.mapTexture();
+		graphics.blit(mapTexture.view(), mapTexture.sampler(), (int) Math.round(drawX), (int) Math.round(drawY),
 				(int) Math.ceil(drawSize), (int) Math.ceil(drawSize), 0.0F, 0.0F, 1.0F, 1.0F);
 
 		if (client.player != null) {
